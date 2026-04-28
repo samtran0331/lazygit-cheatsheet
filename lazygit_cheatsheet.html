@@ -1,0 +1,363 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>LazyGit Cheatsheet</title>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
+        />
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;500;700&display=swap');
+          :root {
+            --ff-mono: 'JetBrains Mono', monospace;
+            --ff-head: 'Syne', sans-serif;
+            --cs-bg-primary: #ffffff;
+            --cs-bg-secondary: #f7f7f8;
+            --cs-border: #d9d9dc;
+            --cs-text-primary: #1f1f23;
+            --cs-text-secondary: #4d4d57;
+            --cs-text-tertiary: #6e6e7a;
+          }
+          body[data-theme="dark"] {
+            --cs-bg-primary: #1b1b20;
+            --cs-bg-secondary: #25252c;
+            --cs-border: #3a3a45;
+            --cs-text-primary: #efeff2;
+            --cs-text-secondary: #c7c7d0;
+            --cs-text-tertiary: #a3a3b1;
+          }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            font-family: var(--ff-head);
+            background: var(--cs-bg-primary);
+            color: var(--cs-text-primary);
+            min-height: 100vh;
+          }
+          .cs-wrap { padding: 1rem 0 2rem; max-width: 680px; }
+          .cs-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 1.5rem; border-bottom: 0.5px solid var(--cs-border); padding-bottom: 1rem; }
+          .cs-title-wrap { display: flex; align-items: baseline; gap: 12px; }
+          .cs-title { font-family: var(--ff-head); font-size: calc(22px * var(--cs-font-scale, 1)); font-weight: 700; color: var(--cs-text-primary); }
+          .cs-sub { font-size: calc(13px * var(--cs-font-scale, 1)); color: var(--cs-text-secondary); }
+          .sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+          .section { background: var(--cs-bg-primary); border: 0.5px solid var(--cs-border); border-radius: 10px; overflow: hidden; }
+          .section-head { padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid var(--cs-border); }
+          .section-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+          .section-label { font-size: calc(11px * var(--cs-font-scale, 1)); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+          .dot-nav { background: #378ADD; }
+          .dot-branch { background: #1D9E75; }
+          .dot-commit { background: #D4537E; }
+          .dot-stash { background: #BA7517; }
+          .dot-file { background: #7F77DD; }
+          .dot-remote { background: #D85A30; }
+          .dot-misc { background: #888780; }
+          .dot-power { background: #2F7E9C; }
+          .label-nav { color: #185FA5; }
+          .label-branch { color: #0F6E56; }
+          .label-commit { color: #993556; }
+          .label-stash { color: #854F0B; }
+          .label-file { color: #534AB7; }
+          .label-remote { color: #993C1D; }
+          .label-misc { color: #5F5E5A; }
+          .label-power { color: #1C5D73; }
+          @media (prefers-color-scheme: dark) {
+            .label-nav { color: #85B7EB; }
+            .label-branch { color: #5DCAA5; }
+            .label-commit { color: #ED93B1; }
+            .label-stash { color: #EF9F27; }
+            .label-file { color: #AFA9EC; }
+            .label-remote { color: #F0997B; }
+            .label-misc { color: #B4B2A9; }
+            .label-power { color: #86C5DC; }
+          }
+          .rows { padding: 6px 0; }
+          .row { display: flex; align-items: center; gap: 10px; padding: 5px 14px; }
+          .row:hover { background: var(--cs-bg-secondary); }
+          .key-group { display: flex; gap: 4px; flex-shrink: 0; min-width: 80px; justify-content: flex-end; }
+          kbd { font-family: var(--ff-mono); font-size: calc(11px * var(--cs-font-scale, 1)); font-weight: 500; padding: 2px 6px; border-radius: 4px; border: 0.5px solid var(--cs-border); background: var(--cs-bg-secondary); color: var(--cs-text-primary); white-space: nowrap; }
+          .row-desc { font-size: calc(13px * var(--cs-font-scale, 1)); color: var(--cs-text-secondary); flex: 1; }
+          .row-desc strong { color: var(--cs-text-primary); font-weight: 500; }
+          .divider { height: 0.5px; background: var(--cs-border); margin: 4px 14px; }
+          .panel-note { font-family: var(--ff-mono); font-size: calc(11px * var(--cs-font-scale, 1)); padding: 8px 14px; color: var(--cs-text-tertiary); border-top: 0.5px solid var(--cs-border); background: var(--cs-bg-secondary); }
+          .full-width { grid-column: 1 / -1; }
+          .panel-row-wide { display: flex; flex-wrap: wrap; gap: 0; }
+          .panel-row-wide .section { flex: 1; min-width: 260px; }
+          .rows-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+          .theme-toggle { font-family: var(--ff-mono); }
+          .header-controls { display: flex; align-items: center; gap: 8px; }
+          .font-btn {
+            min-width: 38px;
+            font-family: var(--ff-mono);
+            font-weight: 700;
+          }
+          .font-size-label {
+            min-width: 46px;
+            text-align: center;
+            font-family: var(--ff-mono);
+            font-size: calc(12px * var(--cs-font-scale, 1));
+            color: var(--cs-text-secondary);
+          }
+          .cs-footer {
+            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            border-top: 0.5px solid var(--cs-border);
+            text-align: center;
+            font-size: calc(12px * var(--cs-font-scale, 1));
+          }
+          .cs-footer a {
+            color: #378ADD;
+            text-decoration: none;
+            font-weight: 600;
+          }
+          .cs-footer a:hover {
+            text-decoration: underline;
+          }
+        </style>
+    </head>
+    <body>
+      <div class="cs-wrap">
+        <div class="cs-header">
+          <div class="cs-title-wrap">
+            <span class="cs-title">lazygit</span>
+            <span class="cs-sub">keyboard reference (default keymap)</span>
+          </div>
+          <div class="header-controls">
+            <button id="font-decrease" class="button is-small is-light font-btn" type="button" aria-label="Decrease font size">A-</button>
+            <span id="font-size-label" class="font-size-label">100%</span>
+            <button id="font-increase" class="button is-small is-light font-btn" type="button" aria-label="Increase font size">A+</button>
+            <button id="theme-toggle" class="button is-small is-light theme-toggle" type="button" aria-label="Toggle light and dark mode">
+              Dark mode
+            </button>
+          </div>
+        </div>
+        <div class="sections">
+      
+          <div class="section">
+            <div class="section-head"><span class="section-dot dot-nav"></span><span class="section-label label-nav">navigation &amp; panels</span></div>
+            <div class="rows">
+              <div class="row"><div class="key-group"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd><kbd>5</kbd></div><div class="row-desc">switch panels: <strong>status / files / branches / commits / stash</strong></div></div>
+              <div class="row"><div class="key-group"><kbd>tab</kbd></div><div class="row-desc">cycle to next panel</div></div>
+              <div class="row"><div class="key-group"><kbd>↑</kbd><kbd>↓</kbd></div><div class="row-desc">navigate items in panel</div></div>
+              <div class="row"><div class="key-group"><kbd>h</kbd><kbd>l</kbd></div><div class="row-desc">switch between panel tabs</div></div>
+              <div class="row"><div class="key-group"><kbd>]</kbd><kbd>[</kbd></div><div class="row-desc">next / previous tab in panel</div></div>
+              <div class="row"><div class="key-group"><kbd>q</kbd></div><div class="row-desc">quit lazygit</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+z</kbd></div><div class="row-desc">suspend lazygit process</div></div>
+              <div class="row"><div class="key-group"><kbd>?</kbd></div><div class="row-desc">show keybinding help</div></div>
+              <div class="row"><div class="key-group"><kbd>+</kbd><kbd>_</kbd></div><div class="row-desc">zoom main panel in / out</div></div>
+              <div class="row"><div class="key-group"><kbd>|</kbd></div><div class="row-desc">cycle pager options</div></div>
+              <div class="row"><div class="key-group"><kbd>@</kbd></div><div class="row-desc">open command log</div></div>
+              <div class="row"><div class="key-group"><kbd>R</kbd></div><div class="row-desc">refresh git state</div></div>
+              <div class="row"><div class="key-group"><kbd>m</kbd></div><div class="row-desc">merge/rebase continue/abort/skip menu</div></div>
+              <div class="row"><div class="key-group"><kbd>(</kbd><kbd>)</kbd></div><div class="row-desc">decrease / increase rename similarity threshold</div></div>
+              <div class="row"><div class="key-group"><kbd>{</kbd><kbd>}</kbd></div><div class="row-desc">decrease / increase diff context lines</div></div>
+              <div class="row"><div class="key-group"><kbd>pgup</kbd><kbd>pgdn</kbd></div><div class="row-desc">scroll main window up / down</div></div>
+            </div>
+          </div>
+      
+          <div class="section">
+            <div class="section-head"><span class="section-dot dot-file"></span><span class="section-label label-file">files panel</span></div>
+            <div class="rows">
+              <div class="row"><div class="key-group"><kbd>space</kbd></div><div class="row-desc">stage / unstage file</div></div>
+              <div class="row"><div class="key-group"><kbd>a</kbd></div><div class="row-desc">stage / unstage <strong>all</strong> files</div></div>
+              <div class="row"><div class="key-group"><kbd>enter</kbd></div><div class="row-desc">open file diff / hunk view</div></div>
+              <div class="row"><div class="key-group"><kbd>d</kbd></div><div class="row-desc">discard changes in file</div></div>
+              <div class="row"><div class="key-group"><kbd>c</kbd></div><div class="row-desc">commit staged changes</div></div>
+              <div class="row"><div class="key-group"><kbd>w</kbd></div><div class="row-desc">commit without pre-commit hook</div></div>
+              <div class="row"><div class="key-group"><kbd>C</kbd></div><div class="row-desc">commit using git editor</div></div>
+              <div class="row"><div class="key-group"><kbd>A</kbd></div><div class="row-desc">amend last commit</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+f</kbd></div><div class="row-desc">find base commit for fixup</div></div>
+              <div class="row"><div class="key-group"><kbd>e</kbd></div><div class="row-desc">open file in editor</div></div>
+              <div class="row"><div class="key-group"><kbd>o</kbd></div><div class="row-desc">open file in OS</div></div>
+              <div class="row"><div class="key-group"><kbd>i</kbd></div><div class="row-desc">add to <strong>.gitignore</strong></div></div>
+              <div class="row"><div class="key-group"><kbd>r</kbd></div><div class="row-desc">refresh file list</div></div>
+              <div class="row"><div class="key-group"><kbd>s</kbd><kbd>S</kbd></div><div class="row-desc">stash (quick) / stash options</div></div>
+              <div class="row"><div class="key-group"><kbd>f</kbd></div><div class="row-desc">fetch remotes</div></div>
+              <div class="row"><div class="key-group"><kbd>D</kbd></div><div class="row-desc">working tree reset options</div></div>
+              <div class="row"><div class="key-group"><kbd>`</kbd></div><div class="row-desc">toggle file tree view (flat/tree)</div></div>
+              <div class="row"><div class="key-group"><kbd>-</kbd><kbd>=</kbd></div><div class="row-desc">collapse / expand all directories</div></div>
+              <div class="row"><div class="key-group"><kbd>M</kbd></div><div class="row-desc">open merge tool</div></div>
+            </div>
+            <div class="panel-note">in hunk/line staging: space toggle line, a toggle hunk mode, E edit hunk, tab switch staged/unstaged</div>
+          </div>
+      
+          <div class="section">
+            <div class="section-head"><span class="section-dot dot-branch"></span><span class="section-label label-branch">branches panel</span></div>
+            <div class="rows">
+              <div class="row"><div class="key-group"><kbd>space</kbd></div><div class="row-desc">checkout branch</div></div>
+              <div class="row"><div class="key-group"><kbd>n</kbd></div><div class="row-desc">new branch</div></div>
+              <div class="row"><div class="key-group"><kbd>N</kbd></div><div class="row-desc">move unpushed commits to new branch</div></div>
+              <div class="row"><div class="key-group"><kbd>c</kbd><kbd>-</kbd></div><div class="row-desc">checkout by name / previous branch</div></div>
+              <div class="row"><div class="key-group"><kbd>d</kbd></div><div class="row-desc">delete branch</div></div>
+              <div class="row"><div class="key-group"><kbd>D</kbd></div><div class="row-desc">force delete branch</div></div>
+              <div class="row"><div class="key-group"><kbd>F</kbd></div><div class="row-desc">force checkout selected branch</div></div>
+              <div class="row"><div class="key-group"><kbd>M</kbd></div><div class="row-desc">merge into current branch</div></div>
+              <div class="row"><div class="key-group"><kbd>r</kbd></div><div class="row-desc">rebase current onto branch</div></div>
+              <div class="row"><div class="key-group"><kbd>f</kbd></div><div class="row-desc">fast-forward branch</div></div>
+              <div class="row"><div class="key-group"><kbd>g</kbd></div><div class="row-desc">branch reset options</div></div>
+              <div class="row"><div class="key-group"><kbd>s</kbd></div><div class="row-desc">change branch sort order</div></div>
+              <div class="row"><div class="key-group"><kbd>o</kbd></div><div class="row-desc">open pull request</div></div>
+              <div class="row"><div class="key-group"><kbd>O</kbd></div><div class="row-desc">PR creation options</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+y</kbd></div><div class="row-desc">copy pull request URL</div></div>
+              <div class="row"><div class="key-group"><kbd>i</kbd></div><div class="row-desc">show git flow options</div></div>
+              <div class="row"><div class="key-group"><kbd>u</kbd></div><div class="row-desc">set / unset upstream</div></div>
+              <div class="row"><div class="key-group"><kbd>T</kbd></div><div class="row-desc">create new tag</div></div>
+              <div class="row"><div class="key-group"><kbd>R</kbd></div><div class="row-desc">rename branch</div></div>
+              <div class="row"><div class="key-group"><kbd>w</kbd></div><div class="row-desc">open worktree options</div></div>
+            </div>
+          </div>
+      
+          <div class="section">
+            <div class="section-head"><span class="section-dot dot-commit"></span><span class="section-label label-commit">commits panel</span></div>
+            <div class="rows">
+              <div class="row"><div class="key-group"><kbd>space</kbd></div><div class="row-desc">checkout commit</div></div>
+              <div class="row"><div class="key-group"><kbd>s</kbd></div><div class="row-desc">squash into previous commit</div></div>
+              <div class="row"><div class="key-group"><kbd>f</kbd></div><div class="row-desc">fixup into previous commit</div></div>
+              <div class="row"><div class="key-group"><kbd>F</kbd></div><div class="row-desc">create <strong>fixup!</strong> commit</div></div>
+              <div class="row"><div class="key-group"><kbd>S</kbd></div><div class="row-desc">autosquash/apply fixup commits</div></div>
+              <div class="row"><div class="key-group"><kbd>r</kbd></div><div class="row-desc">reword commit message</div></div>
+              <div class="row"><div class="key-group"><kbd>R</kbd></div><div class="row-desc">reword in git editor</div></div>
+              <div class="row"><div class="key-group"><kbd>d</kbd></div><div class="row-desc">drop commit</div></div>
+              <div class="row"><div class="key-group"><kbd>e</kbd></div><div class="row-desc">edit commit (pause rebase)</div></div>
+              <div class="row"><div class="key-group"><kbd>p</kbd></div><div class="row-desc">pick commit</div></div>
+              <div class="row"><div class="key-group"><kbd>t</kbd></div><div class="row-desc">revert commit</div></div>
+              <div class="row"><div class="key-group"><kbd>T</kbd></div><div class="row-desc">tag selected commit</div></div>
+              <div class="row"><div class="key-group"><kbd>C</kbd></div><div class="row-desc">copy commit(s) for cherry-pick</div></div>
+              <div class="row"><div class="key-group"><kbd>V</kbd></div><div class="row-desc">paste cherry-pick(s)</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+r</kbd></div><div class="row-desc">reset copied commit selection</div></div>
+              <div class="row"><div class="key-group"><kbd>A</kbd></div><div class="row-desc">amend head commit w/ staged</div></div>
+              <div class="row"><div class="key-group"><kbd>a</kbd></div><div class="row-desc">amend commit attributes (author/co-author)</div></div>
+              <div class="row"><div class="key-group"><kbd>i</kbd></div><div class="row-desc">begin interactive rebase</div></div>
+              <div class="row"><div class="key-group"><kbd>B</kbd></div><div class="row-desc">mark base commit for rebase --onto</div></div>
+              <div class="row"><div class="key-group"><kbd>g</kbd></div><div class="row-desc">reset options onto selected commit</div></div>
+              <div class="row"><div class="key-group"><kbd>n</kbd><kbd>N</kbd></div><div class="row-desc">new branch from commit / move commits to new branch</div></div>
+              <div class="row"><div class="key-group"><kbd>o</kbd></div><div class="row-desc">open commit in browser</div></div>
+              <div class="row"><div class="key-group"><kbd>b</kbd></div><div class="row-desc">open bisect options</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+j</kbd></div><div class="row-desc">move commit <strong>down</strong></div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+k</kbd></div><div class="row-desc">move commit <strong>up</strong></div></div>
+            </div>
+          </div>
+      
+          <div class="section">
+            <div class="section-head"><span class="section-dot dot-remote"></span><span class="section-label label-remote">remote / sync</span></div>
+            <div class="rows">
+              <div class="row"><div class="key-group"><kbd>P</kbd></div><div class="row-desc">push to remote</div></div>
+              <div class="row"><div class="key-group"><kbd>p</kbd></div><div class="row-desc">pull from remote</div></div>
+              <div class="row"><div class="key-group"><kbd>f</kbd></div><div class="row-desc">fetch all remotes</div></div>
+              <div class="row"><div class="key-group"><kbd>F</kbd></div><div class="row-desc">force push</div></div>
+            </div>
+            <div class="panel-note">these work from the status panel (panel 1)</div>
+          </div>
+      
+          <div class="section">
+            <div class="section-head"><span class="section-dot dot-stash"></span><span class="section-label label-stash">stash panel</span></div>
+            <div class="rows">
+              <div class="row"><div class="key-group"><kbd>space</kbd></div><div class="row-desc">apply stash</div></div>
+              <div class="row"><div class="key-group"><kbd>g</kbd></div><div class="row-desc">pop stash (apply + drop)</div></div>
+              <div class="row"><div class="key-group"><kbd>d</kbd></div><div class="row-desc">drop stash entry</div></div>
+              <div class="row"><div class="key-group"><kbd>n</kbd></div><div class="row-desc">new branch from stash</div></div>
+              <div class="row"><div class="key-group"><kbd>r</kbd></div><div class="row-desc">rename stash entry</div></div>
+            </div>
+            <div class="panel-note">stash from files panel → s (selected) or S (all)</div>
+          </div>
+      
+          <div class="section">
+            <div class="section-head"><span class="section-dot dot-power"></span><span class="section-label label-power">remotes / tags / worktrees</span></div>
+            <div class="rows">
+              <div class="row"><div class="key-group"><kbd>enter</kbd></div><div class="row-desc">enter selected list (remote -> branches, tag -> commits)</div></div>
+              <div class="row"><div class="key-group"><kbd>n</kbd></div><div class="row-desc">new remote / new tag / new worktree</div></div>
+              <div class="row"><div class="key-group"><kbd>d</kbd></div><div class="row-desc">delete remote / tag / worktree item</div></div>
+              <div class="row"><div class="key-group"><kbd>e</kbd></div><div class="row-desc">edit remote URL/name</div></div>
+              <div class="row"><div class="key-group"><kbd>f</kbd></div><div class="row-desc">fetch selected remote</div></div>
+              <div class="row"><div class="key-group"><kbd>F</kbd></div><div class="row-desc">add fork remote</div></div>
+              <div class="row"><div class="key-group"><kbd>P</kbd></div><div class="row-desc">push selected tag</div></div>
+              <div class="row"><div class="key-group"><kbd>space</kbd></div><div class="row-desc">checkout tag/remote branch or switch worktree</div></div>
+              <div class="row"><div class="key-group"><kbd>u</kbd></div><div class="row-desc">set selected remote branch as upstream</div></div>
+              <div class="row"><div class="key-group"><kbd>o</kbd></div><div class="row-desc">open selected worktree in editor</div></div>
+            </div>
+            <div class="panel-note">use <kbd>w</kbd> in branches/commits/stash to jump into worktree actions quickly</div>
+          </div>
+      
+          <div class="section full-width">
+            <div class="section-head"><span class="section-dot dot-misc"></span><span class="section-label label-misc">universal / anywhere</span></div>
+            <div class="rows rows-grid">
+              <div class="row"><div class="key-group"><kbd>/</kbd></div><div class="row-desc">filter / search list</div></div>
+              <div class="row"><div class="key-group"><kbd>esc</kbd></div><div class="row-desc">cancel / close panel</div></div>
+              <div class="row"><div class="key-group"><kbd>:</kbd></div><div class="row-desc">run shell command</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+r</kbd></div><div class="row-desc">switch recent repos</div></div>
+              <div class="row"><div class="key-group"><kbd>x</kbd></div><div class="row-desc">context menu for item</div></div>
+              <div class="row"><div class="key-group"><kbd>W</kbd></div><div class="row-desc">diff options menu</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+w</kbd></div><div class="row-desc">toggle whitespace changes in diff</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+e</kbd></div><div class="row-desc">quick diff options (alt keybinding)</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+s</kbd></div><div class="row-desc">commit log filter options</div></div>
+              <div class="row"><div class="key-group"><kbd>v</kbd></div><div class="row-desc">range-select mode in lists</div></div>
+              <div class="row"><div class="key-group"><kbd>shift+↑</kbd><kbd>shift+↓</kbd></div><div class="row-desc">expand/shrink range selection</div></div>
+              <div class="row"><div class="key-group"><kbd>,</kbd><kbd>.</kbd></div><div class="row-desc">previous / next page</div></div>
+              <div class="row"><div class="key-group"><kbd>&lt;</kbd><kbd>&gt;</kbd></div><div class="row-desc">jump to top / bottom of list</div></div>
+              <div class="row"><div class="key-group"><kbd>H</kbd><kbd>L</kbd></div><div class="row-desc">scroll main panel left / right</div></div>
+              <div class="row"><div class="key-group"><kbd>z</kbd></div><div class="row-desc">undo last action</div></div>
+              <div class="row"><div class="key-group"><kbd>Z</kbd></div><div class="row-desc">redo last undone action</div></div>
+              <div class="row"><div class="key-group"><kbd>0</kbd></div><div class="row-desc">focus main panel from side list</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+o</kbd></div><div class="row-desc">copy key item to clipboard (hash/path/branch)</div></div>
+              <div class="row"><div class="key-group"><kbd>ctrl+t</kbd></div><div class="row-desc">open external difftool (where supported)</div></div>
+            </div>
+          </div>
+      
+        </div>
+        <div class="cs-footer">
+          <a href="https://github.com/jesseduffield/lazygit" target="_blank" rel="noopener noreferrer">LazyGit on GitHub</a>
+        </div>
+      </div>
+      <script>
+        (function () {
+          var themeStorageKey = "lazygit-cheatsheet-theme";
+          var fontStorageKey = "lazygit-cheatsheet-font-scale";
+          var toggle = document.getElementById("theme-toggle");
+          var fontDecrease = document.getElementById("font-decrease");
+          var fontIncrease = document.getElementById("font-increase");
+          var fontSizeLabel = document.getElementById("font-size-label");
+          if (!toggle || !fontDecrease || !fontIncrease || !fontSizeLabel) return;
+
+          function setTheme(theme) {
+            document.body.setAttribute("data-theme", theme);
+            localStorage.setItem(themeStorageKey, theme);
+            toggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+            toggle.className = theme === "dark"
+              ? "button is-small is-dark theme-toggle"
+              : "button is-small is-light theme-toggle";
+          }
+
+          function setFontScale(scale) {
+            var minScale = 0.85;
+            var maxScale = 1.35;
+            var clamped = Math.min(maxScale, Math.max(minScale, scale));
+            var rounded = Math.round(clamped * 100) / 100;
+            document.documentElement.style.setProperty("--cs-font-scale", String(rounded));
+            localStorage.setItem(fontStorageKey, String(rounded));
+            fontSizeLabel.textContent = String(Math.round(rounded * 100)) + "%";
+          }
+
+          var storedTheme = localStorage.getItem(themeStorageKey);
+          var preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          setTheme(storedTheme || preferredTheme);
+          var storedFontScale = parseFloat(localStorage.getItem(fontStorageKey) || "");
+          setFontScale(Number.isFinite(storedFontScale) ? storedFontScale : 1);
+
+          toggle.addEventListener("click", function () {
+            var currentTheme = document.body.getAttribute("data-theme") || "light";
+            setTheme(currentTheme === "dark" ? "light" : "dark");
+          });
+
+          fontDecrease.addEventListener("click", function () {
+            var currentScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cs-font-scale")) || 1;
+            setFontScale(currentScale - 0.05);
+          });
+
+          fontIncrease.addEventListener("click", function () {
+            var currentScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cs-font-scale")) || 1;
+            setFontScale(currentScale + 0.05);
+          });
+        })();
+      </script>
+    </body>
+</html>
+
