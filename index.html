@@ -34,12 +34,16 @@
             color: var(--cs-text-primary);
             min-height: 100vh;
           }
-          .cs-wrap { padding: 1rem 0 2rem; max-width: 680px; }
+          .cs-wrap {
+            width: min(92%, 1200px);
+            margin: 0 auto;
+            padding: 1rem max(20px, 2%) 2rem;
+          }
           .cs-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 1.5rem; border-bottom: 0.5px solid var(--cs-border); padding-bottom: 1rem; }
           .cs-title-wrap { display: flex; align-items: baseline; gap: 12px; }
           .cs-title { font-family: var(--ff-head); font-size: calc(22px * var(--cs-font-scale, 1)); font-weight: 700; color: var(--cs-text-primary); }
           .cs-sub { font-size: calc(13px * var(--cs-font-scale, 1)); color: var(--cs-text-secondary); }
-          .sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+          .sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
           .section { background: var(--cs-bg-primary); border: 0.5px solid var(--cs-border); border-radius: 10px; overflow: hidden; }
           .section-head { padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid var(--cs-border); }
           .section-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -111,6 +115,9 @@
           }
           .cs-footer a:hover {
             text-decoration: underline;
+          }
+          @media (max-width: 900px) {
+            .sections { grid-template-columns: 1fr; }
           }
         </style>
     </head>
