@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://samtran0331.github.io/lazygit-cheatsheet/sitemap.xml
