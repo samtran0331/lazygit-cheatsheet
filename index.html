@@ -88,6 +88,7 @@
           .panel-row-wide .section { flex: 1; min-width: 260px; }
           .rows-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
           .theme-toggle { font-family: var(--ff-mono); }
+          .print-btn { font-family: var(--ff-mono); }
           .header-controls { display: flex; align-items: center; gap: 8px; }
           .font-btn {
             min-width: 38px;
@@ -119,6 +120,33 @@
           @media (max-width: 900px) {
             .sections { grid-template-columns: 1fr; }
           }
+          @media print {
+            @page { margin: 12mm; }
+            body {
+              background: #fff;
+              color: #000;
+            }
+            .cs-wrap {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+            }
+            .header-controls { display: none !important; }
+            .sections {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 0.5rem;
+            }
+            .section {
+              break-inside: avoid;
+              border: 1px solid #bbb;
+              border-radius: 0;
+            }
+            .row:hover { background: transparent; }
+            .cs-footer a {
+              color: inherit;
+              text-decoration: none;
+            }
+          }
         </style>
     </head>
     <body>
@@ -135,6 +163,7 @@
             <button id="theme-toggle" class="button is-small is-light theme-toggle" type="button" aria-label="Toggle light and dark mode">
               Dark mode
             </button>
+            <button id="print-page" class="button is-small is-light print-btn" type="button" aria-label="Print this page">Print</button>
           </div>
         </div>
         <div class="sections">
@@ -322,7 +351,8 @@
           var fontDecrease = document.getElementById("font-decrease");
           var fontIncrease = document.getElementById("font-increase");
           var fontSizeLabel = document.getElementById("font-size-label");
-          if (!toggle || !fontDecrease || !fontIncrease || !fontSizeLabel) return;
+          var printPage = document.getElementById("print-page");
+          if (!toggle || !fontDecrease || !fontIncrease || !fontSizeLabel || !printPage) return;
 
           function setTheme(theme) {
             document.body.setAttribute("data-theme", theme);
@@ -362,6 +392,10 @@
           fontIncrease.addEventListener("click", function () {
             var currentScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cs-font-scale")) || 1;
             setFontScale(currentScale + 0.05);
+          });
+
+          printPage.addEventListener("click", function () {
+            window.print();
           });
         })();
       </script>
